@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#166534">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="진흥녹화 일지">
+    <meta name="application-name" content="진흥녹화 일지">
+    <meta name="format-detection" content="telephone=no">
+    <title>진흥녹화센터 작업일지</title>
+    <style>
+        html { min-height: 100%; background-color: #f3f4f6; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f3f4f6; min-height: 100vh; min-height: 100dvh; margin: 0; padding: 0; padding-bottom: calc(88px + env(safe-area-inset-bottom)); color: #1f2937; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        
+        .top-sticky-container { position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .header { background-color: #166534; color: white; padding: calc(12px + env(safe-area-inset-top)) 15px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { margin: 0; font-size: 16px; font-weight: bold; }
+        .header-btns { display: flex; gap: 8px; }
+        .btn-sm { background-color: white; color: #166534; border: none; min-height: 40px; padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        
+        .tab-nav { display: flex; background: white; border-bottom: 1px solid #e5e7eb; }
+        .tab-btn { flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px 0; font-size: 13px; font-weight: bold; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; touch-action: manipulation; }
+        .tab-btn.active { color: #166534; border-bottom: 3px solid #166534; }
+        
+        .tab-pane { display: none; }
+        .tab-pane.active-pane { display: block; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        .card { background-color: white; margin: 12px 10px; padding: 12px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .card-title { font-size: 14px; font-weight: bold; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .title-green { color: #166534; border-color: #166534; } .title-orange { color: #ea580c; border-color: #ea580c; }
+        .title-purple { color: #9333ea; border-color: #9333ea; } .title-blue { color: #2563eb; border-color: #2563eb; }
+        
+        .label { display: block; font-size: 12px; font-weight: bold; color: #4b5563; margin-bottom: 4px; }
+        input, select, textarea { width: 100%; min-height: 44px; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box; background-color: #f9fafb; margin-bottom: 8px; color: #111827; }
+        textarea { min-height: 76px; resize: vertical; }
+        button, label { touch-action: manipulation; }
+        button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, .tab-btn:focus-visible { outline: 3px solid #60a5fa; outline-offset: 2px; }
+        .flex-row { display: flex; gap: 8px; } .flex-1 { flex: 1; min-width: 0; }
+        
+        .btn-add { width: 100%; min-height: 48px; padding: 13px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; margin-top: 4px; margin-bottom: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); letter-spacing: -0.3px; }
+        .btn-orange { background-color: #ffedd5; color: #9a3412; border: 1px solid #fdba74; }
+        .btn-purple { background-color: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+        .btn-blue { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        
+        ul { list-style: none; padding: 0; margin: 0; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f3f4f6; font-size: 13px; }
+        .del-btn { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; min-height: 40px; padding: 4px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        
+        .badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-left: 4px; }
+        .total-badge { font-size: 12px; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+        
+        .radio-wrap { display: flex; gap: 8px; margin-bottom: 8px; }
+        .radio-label { flex: 1; cursor: pointer; }
+        .radio-label input[type="radio"] { display: none; } 
+        .radio-btn { display: block; text-align: center; border: 1px solid #d1d5db; padding: 10px; border-radius: 8px; background: #f9fafb; font-weight: bold; font-size: 14px; transition: 0.2s; color: #4b5563; }
+        .radio-label input[type="radio"]:checked + .radio-btn { background-color: #dbeafe; border-color: #2563eb; color: #1e40af; box-shadow: inset 0 0 0 1px #2563eb; } 
+        
+        .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 8px 10px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); display: flex; gap: 6px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
+        .btn-nav { min-height: 52px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; }
+        .btn-nav:disabled { opacity: 0.6; cursor: wait; }
+        
+        .modal { display: none; position: fixed; inset: 0; width: 100%; min-height: 100vh; min-height: 100dvh; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: calc(15px + env(safe-area-inset-top)) 15px calc(15px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+        .modal-box { background: white; width: 100%; max-width: 400px; border-radius: 12px; max-height: 85vh; max-height: 85dvh; display: flex; flex-direction: column; }
+        .modal-header { padding: 12px; background: #166534; color: white; font-weight: bold; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; font-size: 14px; }
+        .modal-body { padding: 12px; overflow-y: auto; flex: 1; }
+        .close-btn { width: 100%; padding: 12px; background: #e5e7eb; border: none; font-weight: bold; border-radius: 0 0 12px 12px; font-size: 14px; cursor: pointer; }
+        .saved-log-toolbar { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 0 10px; margin-bottom:4px; border-bottom:1px solid #e5e7eb; }
+        #list_saved .list-item { gap:8px; }
+        #list_saved .list-item > div:first-child { min-width:0; flex:1; }
+        .saved-log-actions { display:flex; align-items:center; gap:6px; margin-left:8px; flex-shrink:0; }
+        .delete-all-btn { min-height:40px; padding:7px 11px; border:1px solid #fecaca; border-radius:8px; background:#fee2e2; color:#b91c1c; font-size:12px; font-weight:bold; cursor:pointer; white-space:nowrap; }
+        
+        #loadingOverlay { display:none; position: fixed; inset:0; width:100%; min-height:100vh; min-height:100dvh; background:rgba(0,0,0,0.85); z-index: 9998; color:white; justify-content:center; align-items:center; flex-direction:column; font-weight:bold; text-align:center; padding:20px; box-sizing:border-box;}
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #successOverlay { display:none; position:fixed; inset:0; width:100%; min-height:100vh; min-height:100dvh; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; padding:calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        #main-content { overflow-x: hidden; position: relative; padding-bottom: 20px; touch-action: pan-y; }
+        .edge-nav { position: fixed; top: 50%; z-index: 45; width: 30px; height: 76px; border: 1px solid rgba(22,101,52,0.28); background: rgba(255,255,255,0.92); color: #166534; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; line-height: 1; cursor: pointer; transform: translateY(-50%); box-shadow: 0 3px 12px rgba(0,0,0,0.16); touch-action: manipulation; }
+        .edge-nav-left { left: 0; border-left: 0; border-radius: 0 14px 14px 0; }
+        .edge-nav-right { right: 0; border-right: 0; border-radius: 14px 0 0 14px; }
+        .edge-nav[hidden] { display: none; }
+        .edge-nav:focus-visible { outline: 3px solid #60a5fa; outline-offset: 2px; }
+
+        #initCheck { display: flex; flex-direction: column; justify-content: center; align-items: center; position: fixed; inset: 0; width: 100%; min-height: 100vh; min-height: 100dvh; background: white; z-index: 99999; padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); text-align: center; box-sizing: border-box; }
+        @media (max-width: 360px) { .header { padding-left: 10px; padding-right: 10px; } .header h1 { font-size: 14px; } .btn-sm { padding-left: 8px; padding-right: 8px; font-size: 11px; } .tab-btn { font-size: 12px; } .saved-log-toolbar { align-items:stretch; flex-direction:column; } .delete-all-btn { width:100%; } .saved-log-actions { gap:4px; margin-left:4px; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    </style>
+</head>
+<body>
+
+    <div id="initCheck">
+        <div style="font-size:50px; margin-bottom:15px;">⏳</div>
+        <h2 style="color:#166534; font-size:22px; font-weight:bold; margin-bottom:10px;">앱을 준비하는 중입니다...</h2>
+        <p style="color:#6b7280; font-size:13px; line-height:1.6;">만약 이 화면이 3초 이상 멈춰있다면,<br>스마트폰 내부의 임시 데이터가 꼬인 상태입니다.</p>
+        <button onclick="forceResetApp()" style="margin-top:25px; padding:12px 24px; background:#ef4444; color:white; border:none; border-radius:8px; font-size:15px; font-weight:bold; cursor:pointer; box-shadow:0 4px 6px rgba(239,68,68,0.3);">앱 강제 초기화 (오류 해결)</button>
+    </div>
+
+    <div id="editAlert" style="display:none; background:#fef08a; color:#a16207; padding:8px; font-weight:bold; font-size:12px; text-align:center;">⚠️ 저장된 일지를 수정 중입니다. 완료 후 [일괄 처리]를 눌러주세요.</div>
+
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div style="font-size:15px; margin-bottom: 5px;">🚀 입력 원본을 먼저 안전하게 저장하고<br>누적 Excel을 갱신하고 있습니다...</div>
+        <div style="font-size:12px; color:#e5e7eb; margin-bottom:4px;">누적 자료가 많으면 1~2분 걸릴 수 있습니다.</div>
+        <div style="font-size:12px; color:#fde047;">iPhone은 공유 창에서 ‘파일에 저장’을 선택하세요.</div>
+    </div>
+
+    <div id="successOverlay">
+        <div style="background:white; width:100%; max-width:350px; border-radius:14px; padding:25px 20px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.3); animation: popIn 0.3s ease;">
+            <div id="resultIcon" style="font-size:55px; margin-bottom:10px;">🎉</div>
+            <h2 id="resultTitle" style="font-size:22px; color:#15803d; margin:0 0 12px 0; font-weight:bold;">일괄 처리 완료!</h2>
+            <div id="resultSummary" style="font-size:13px; color:#374151; line-height:1.6; background:#f0fdf4; padding:12px; border-radius:8px; margin-bottom:18px; text-align:left; border:1px solid #bbf7d0;">
+                <b id="cloudSaveLine">☁️ 구글 드라이브 저장 확인 중...</b><br>
+                <b id="mobileSaveLine">📲 파일 공유/저장 처리 완료</b><br>
+                <b>💾 내부 임시저장 완료</b>
+            </div>
+            <p id="resultNote" style="font-size:11px; color:#6b7280; margin-bottom:18px;">아래 버튼을 누르시면 내일 일지 작성을 위해<br>화면이 깨끗하게 초기화됩니다.</p>
+            <button id="resultCloseButton" type="button" onclick="closeResultOverlay()" style="width:100%; padding:14px; background:#166534; color:white; border:none; border-radius:10px; font-size:16px; font-weight:bold; cursor:pointer; box-shadow:0 4px 6px rgba(22,101,52,0.3);">확인 (화면 초기화)</button>
+        </div>
+    </div>
+
+    <div id="localSaveConfirmOverlay" style="display:none; position:fixed; inset:0; z-index:10015; background:rgba(0,0,0,0.65); padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom)); align-items:center; justify-content:center; box-sizing:border-box;">
+        <div role="dialog" aria-modal="true" aria-labelledby="localSaveConfirmTitle" style="background:white; width:100%; max-width:420px; max-height:88vh; border-radius:16px; padding:20px; box-shadow:0 12px 30px rgba(0,0,0,0.35); display:flex; flex-direction:column; box-sizing:border-box;">
+            <h2 id="localSaveConfirmTitle" style="font-size:20px; color:#374151; margin:0 0 8px; text-align:center;">💾 임시저장 입력내용 확인</h2>
+            <p style="font-size:12px; color:#6b7280; margin:0 0 12px; text-align:center;">현재 입력내용을 확인한 뒤 임시저장하세요.</p>
+            <pre id="localSaveConfirmText" style="margin:0; padding:14px; min-height:180px; max-height:58vh; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font-family:inherit; font-size:13px; line-height:1.65; color:#1f2937; background:#f8fafc; border:1px solid #9ca3af; border-radius:10px; text-align:left;"></pre>
+            <div style="display:flex; gap:10px; margin-top:14px;">
+                <button type="button" onclick="cancelLocalSave()" style="flex:1; min-height:48px; border:none; border-radius:10px; background:#e5e7eb; color:#374151; font-size:15px; font-weight:bold;">수정하기</button>
+                <button type="button" onclick="confirmLocalSave()" style="flex:1.35; min-height:48px; border:none; border-radius:10px; background:#4b5563; color:white; font-size:15px; font-weight:bold;">확인 후 임시저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="kakaoConfirmOverlay" style="display:none; position:fixed; inset:0; z-index:10020; background:rgba(0,0,0,0.65); padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom)); align-items:center; justify-content:center; box-sizing:border-box;">
+        <div role="dialog" aria-modal="true" aria-labelledby="kakaoConfirmTitle" style="background:white; width:100%; max-width:420px; max-height:88vh; border-radius:16px; padding:20px; box-shadow:0 12px 30px rgba(0,0,0,0.35); display:flex; flex-direction:column; box-sizing:border-box;">
+            <h2 id="kakaoConfirmTitle" style="font-size:20px; color:#7c4a03; margin:0 0 8px; text-align:center;">💬 카카오톡 전송내용 확인</h2>
+            <p style="font-size:12px; color:#6b7280; margin:0 0 12px; text-align:center;">아래 내용을 확인한 뒤 전송하기를 눌러주세요.</p>
+            <pre id="kakaoConfirmText" style="margin:0; padding:14px; min-height:160px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; font-family:inherit; font-size:13px; line-height:1.65; color:#1f2937; background:#fffbeb; border:1px solid #facc15; border-radius:10px; text-align:left;"></pre>
+            <div style="display:flex; gap:10px; margin-top:14px;">
+                <button type="button" onclick="cancelKakaoShare()" style="flex:1; min-height:48px; border:none; border-radius:10px; background:#e5e7eb; color:#374151; font-size:15px; font-weight:bold;">수정하기</button>
+                <button type="button" onclick="confirmKakaoShare()" style="flex:1.35; min-height:48px; border:none; border-radius:10px; background:#FEE500; color:#191919; font-size:15px; font-weight:bold;">확인 후 전송</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-sticky-container">
+        <header class="header">
+            <h1>진흥녹화센터 일지</h1>
+            <div class="header-btns">
+                <button type="button" class="btn-sm" onclick="openModal()">📂 이전 일지</button>
+                <button type="button" class="btn-sm" onclick="resetForm()">📄 새 일지</button>
+            </div>
+        </header>
+        <div class="tab-nav">
+            <div id="tab-btn-0" class="tab-btn active" onclick="switchTab(0)">📝기본정보</div>
+            <div id="tab-btn-1" class="tab-btn" onclick="switchTab(1)">👷작업자</div>
+            <div id="tab-btn-2" class="tab-btn" onclick="switchTab(2)">🚜장비</div>
+            <div id="tab-btn-3" class="tab-btn" onclick="switchTab(3)">💳경비</div>
+        </div>
+    </div>
+
+    <button type="button" id="edgePrev" class="edge-nav edge-nav-left" onclick="switchTab(currentTab - 1)" aria-label="이전 화면" hidden>‹</button>
+    <button type="button" id="edgeNext" class="edge-nav edge-nav-right" onclick="switchTab(currentTab + 1)" aria-label="다음 화면">›</button>
+
+    <main id="main-content">
+        
+        <div id="tab-pane-0" class="tab-pane active-pane">
+            <div class="card" style="border-top: 4px solid #166534;">
+                <div class="card-title title-green">📝 기본 정보</div>
+                <div class="flex-row">
+                    <div class="flex-1">
+                        <label class="label" for="i_writer">작성자</label>
+                        <select id="i_writer" onchange="saveWriter()">
+                            <option>사장</option><option>최원장</option><option>진원장</option><option>고이사</option><option>최과장</option><option>백대리</option><option>최기사</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <span class="label">일지 번호</span>
+                        <input type="text" id="i_count" value="자동부여" readonly aria-label="자동 일지 번호" style="margin-bottom:0; text-align:center; background:#f8fafc; font-weight:bold;">
+                    </div>
+                </div>
+                <div class="flex-row">
+                    <div class="flex-1"><span class="label">작업 날짜</span><input type="date" id="i_date" onchange="if(!currentLogId) loadCount()"></div>
+                    <div class="flex-1"><span class="label">날씨</span><select id="i_weather"><option>맑음</option><option>흐림</option><option>비</option><option>눈</option></select></div>
+                </div>
+                <span class="label">현장명</span><input type="text" id="i_site" placeholder="현장명을 입력하세요">
+                <div class="flex-row">
+                    <div class="flex-1"><span class="label">누적 작업일</span><input type="number" id="i_days" min="0" step="1" inputmode="numeric" placeholder="일차"></div>
+                    <div class="flex-1"><span class="label">진행율 (%)</span><input type="number" id="i_prog" min="0" max="100" step="1" inputmode="decimal" placeholder="%"></div>
+                </div>
+                <span class="label">반입자재 및 특기사항</span>
+                <textarea id="i_note" rows="3" placeholder="사무실 자재 외부자재 입력"></textarea>
+            </div>
+        </div>
+
+        <div id="tab-pane-1" class="tab-pane">
+            <div class="card" style="border-top: 4px solid #ea580c;">
+                <div class="card-title title-orange"><div>👷 작업자 투입</div><div class="total-badge" style="background:#ffedd5; color:#9a3412;">총 <span id="cnt_w">0</span>명</div></div>
+                <button type="button" class="btn-add btn-orange" onclick="addWorker()">+ 작업자 추가하기</button>
+                <div class="flex-row" style="margin-bottom:8px;">
+                    <select id="w_name_choice" aria-label="작업자 선택" onchange="toggleCustomName('w')" style="margin-bottom:0; flex:1; min-width:0;">
+                        <option value="" selected disabled>작업자 선택</option>
+                        <option value="박정준">박정준</option><option value="이창수">이창수</option><option value="사장님">사장님</option>
+                        <option value="최원장">최원장</option><option value="진원장">진원장</option><option value="고이사">고이사</option>
+                        <option value="최과장">최과장</option><option value="백대리">백대리</option><option value="최기사">최기사</option>
+                        <option value="__custom__">✏️ 직접 입력</option>
+                    </select>
+                    <select id="w_type" aria-label="근무 시간" style="margin-bottom:0; width:38%;"><option>전일</option><option>반일</option><option>잔업</option></select>
+                </div>
+                <input type="text" id="w_name_custom" autocomplete="off" enterkeyhint="done" placeholder="작업자 이름을 직접 입력하세요" style="display:none;">
+                <ul id="list_w" style="border:1px solid #e5e7eb; border-radius:8px; padding:0 8px;"></ul>
+            </div>
+        </div>
+
+        <div id="tab-pane-2" class="tab-pane">
+            <div class="card" style="border-top: 4px solid #9333ea;">
+                <div class="card-title title-purple">🚜 동원/임차 장비</div>
+                <button type="button" class="btn-add btn-purple" onclick="addEquip()">+ 장비 추가하기</button>
+                <div class="flex-row" style="margin-bottom:8px;">
+                    <select id="eq_type" aria-label="장비 구분" style="margin-bottom:0; width:38%;"><option>자체동원</option><option>외부임차</option></select>
+                    <select id="eq_name_choice" aria-label="장비 선택" onchange="toggleCustomName('eq')" style="margin-bottom:0; flex:1; min-width:0;">
+                        <option value="" selected disabled>장비 선택</option>
+                        <option value="고소차2.5톤">고소차2.5톤</option><option value="고소차1톤">고소차1톤</option><option value="방제차 구형">방제차 구형</option>
+                        <option value="방제차 신형">방제차 신형</option><option value="에어맨">에어맨</option><option value="얀마017">얀마017</option>
+                        <option value="얀마0.23">얀마0.23</option><option value="2.5카고">2.5카고</option>
+                        <option value="아보툼">아보툼</option><option value="저항드릴">저항드릴</option>
+                        <option value="__custom__">✏️ 직접 입력</option>
+                    </select>
+                </div>
+                <input type="text" id="eq_name_custom" autocomplete="off" enterkeyhint="done" placeholder="장비명을 직접 입력하세요" style="display:none;">
+                <input type="number" id="eq_cost" min="0" step="1" inputmode="numeric" placeholder="비용 입력 (자체동원 시 생략가능/원)">
+                <ul id="list_eq" style="border:1px solid #e5e7eb; border-radius:8px; padding:0 8px;"></ul>
+            </div>
+        </div>
+
+        <div id="tab-pane-3" class="tab-pane">
+            <div class="card" style="border-top: 4px solid #2563eb;">
+                <div class="card-title title-blue"><div>💳 경비 내역</div><div class="total-badge" style="background:#dbeafe; color:#1e40af;">총 <span id="cnt_ex">0</span>원</div></div>
+
+                <div class="radio-wrap">
+                    <label class="radio-label">
+                        <input type="radio" name="payType" value="카드" checked>
+                        <div class="radio-btn">💳 카드 결제</div>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="payType" value="현금">
+                        <div class="radio-btn">💵 현금 결제</div>
+                    </label>
+                </div>
+                
+                <div class="flex-row">
+                    <select id="ex_cat" style="width:40%;">
+                        <option selected>중식</option><option>참</option><option>자재대</option><option>기타</option>
+                    </select>
+                    <input type="text" id="ex_desc" placeholder="내용 (예: 철물점/식당명)">
+                </div>
+                <input type="number" id="ex_amt" min="1" step="1" inputmode="numeric" placeholder="금액 입력 (원)">
+                
+                <button type="button" onclick="requestExpensePhoto()" style="display:block; width:100%; text-align:center; background:#f3f4f6; border:1px solid #d1d5db; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px; font-size:13px; color:#1f2937;">📸 사진 촬영 후 경비 자동등록</button>
+                <input type="file" id="ex_file" accept="image/*" capture="environment" style="display:none;" onchange="previewImg(this)">
+                
+                <div id="pBox" style="display:none; text-align:center; background:#dcfce7; padding:8px; border-radius:8px; margin-bottom:8px;"><span style="font-size:12px; color:#166534; font-weight:bold;">✅ 영수증 사진 첨부 완료</span><br><img id="pImg" style="height:70px; width:auto; border-radius:6px; border:1px solid #ccc; margin-top:4px;"></div>
+                <ul id="list_ex" style="border:1px solid #e5e7eb; border-radius:8px; padding:0 8px;"></ul>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="bottom-bar">
+        <button type="button" class="btn-nav" style="background-color: #4b5563; flex: 1; font-size: 13px; padding: 12px 4px; color:white;" onclick="requestLocalSave()">💾<br>임시저장</button>
+        <button type="button" class="btn-nav" style="background-color: #FEE500; flex: 1.2; font-size: 13px; padding: 12px 4px; color:#191919;" onclick="shareKakaoSummary()">💬<br>카톡요약</button>
+        <button type="button" id="sendAllButton" class="btn-nav" style="background-color: #2563eb; flex: 2; font-size: 15px; padding: 12px 4px; color:white;" onclick="saveAndSendAll()">🚀 일괄 처리<br><span style="font-size:11px; font-weight:normal; margin-top:2px;">(저장+파일공유+전송)</span></button>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-box">
+            <div class="modal-header"><span>📂 저장된 일지 목록</span><span style="cursor:pointer; font-size:18px; line-height:1;" onclick="closeModal()">X</span></div>
+            <div class="modal-body">
+                <div class="saved-log-toolbar">
+                    <span style="font-size:11px; color:#6b7280; line-height:1.45;">이 기기에는 최근 일지<br>최대 20건만 보관됩니다.</span>
+                    <button type="button" class="delete-all-btn" onclick="deleteAllSavedLogs()">🗑️ 저장 일지 전체삭제</button>
+                </div>
+                <ul id="list_saved"></ul>
+                <div id="noLogs" style="text-align:center; padding:20px 0; color:#6b7280; font-weight:bold; font-size:13px; display:none;">저장된 일지가 없습니다.</div>
+            </div>
+            <button type="button" class="close-btn" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        // ★★★ 사장님의 구글 웹 앱 URL 주소 (반드시 본인의 배포 URL로 변경해 주세요!) ★★★
+        var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4xlaFdx2GQMouJ4Qez9X0XXr1UkgLo0xxnUiH5wTb2s85CprLw6oDOvI4eUj6w1JLhw/exec"; 
+
+        var currentLogId = null, workers = [], equips = [], expenses = [];
+        var tempPhotoData = ""; 
+        var currentTab = 0;
+        var startX = 0, startY = 0, endX = 0, endY = 0;
+        var maxTab = 3;
+        var tabNames = ["기본정보", "작업자", "장비", "경비"];
+        var isProcessing = false;
+        var lastUploadOk = false;
+        var pendingKakaoSummary = "";
+        var MAX_LOCAL_LOGS = 20;
+
+        // 🚀 앱 꼬임 강제 해결 함수
+        function forceResetApp() {
+            try { window.localStorage.clear(); } catch(e) {}
+            alert("✅ 초기화 완료! 이제 앱이 정상적으로 열립니다.");
+            location.reload();
+        }
+
+        // 🚀 정상 로딩 시 안전장치 화면 숨기기
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('initCheck').style.display = 'none';
+            for(var i=0; i<=maxTab; i++) {
+                var tab = document.getElementById('tab-btn-' + i);
+                tab.setAttribute('role', 'tab');
+                tab.setAttribute('tabindex', i === 0 ? '0' : '-1');
+                tab.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+                tab.setAttribute('aria-controls', 'tab-pane-' + i);
+                document.getElementById('tab-pane-' + i).setAttribute('role', 'tabpanel');
+            }
+            updateEdgeNavigation();
+        });
+
+        window.addEventListener('pageshow', function(event) {
+            document.getElementById('initCheck').style.display = 'none';
+            if(event.persisted) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                isProcessing = false;
+                document.getElementById('sendAllButton').disabled = false;
+            }
+        });
+
+        function switchTab(index) {
+            if(index < 0 || index > maxTab) return;
+            if(index === currentTab) return;
+            var oldPane = document.getElementById('tab-pane-' + currentTab);
+            var newPane = document.getElementById('tab-pane-' + index);
+            
+            oldPane.classList.remove('active-pane');
+            document.getElementById('tab-btn-' + currentTab).classList.remove('active');
+            
+            if (index > currentTab) {
+                newPane.style.animation = "slideInRight 0.2s ease-out forwards";
+            } else {
+                newPane.style.animation = "slideInLeft 0.2s ease-out forwards";
+            }
+            
+            currentTab = index;
+            newPane.classList.add('active-pane');
+            var activeTab = document.getElementById('tab-btn-' + currentTab);
+            activeTab.classList.add('active');
+            for(var i=0; i<=maxTab; i++) {
+                var tab = document.getElementById('tab-btn-' + i);
+                tab.setAttribute('aria-selected', i === currentTab ? 'true' : 'false');
+                tab.setAttribute('tabindex', i === currentTab ? '0' : '-1');
+            }
+            updateEdgeNavigation();
+            window.scrollTo(0, 0); 
+        }
+
+        function updateEdgeNavigation() {
+            var prevButton = document.getElementById('edgePrev');
+            var nextButton = document.getElementById('edgeNext');
+            if(!prevButton || !nextButton) return;
+
+            prevButton.hidden = currentTab <= 0;
+            nextButton.hidden = currentTab >= maxTab;
+            if(currentTab > 0) prevButton.setAttribute('aria-label', '이전 화면: ' + tabNames[currentTab - 1]);
+            if(currentTab < maxTab) nextButton.setAttribute('aria-label', '다음 화면: ' + tabNames[currentTab + 1]);
+        }
+
+        document.addEventListener('touchstart', function(e) {
+            startX = e.changedTouches[0].clientX;
+            startY = e.changedTouches[0].clientY;
+        }, {passive: true});
+
+        document.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
+            var xDiff = startX - endX;
+            var yDiff = startY - endY;
+            
+            if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 40) {
+                var target = e.target;
+                if(target && target.closest && target.closest('input, textarea, select, button, label, a')) return;
+
+                if (xDiff > 0) {
+                    if(currentTab < maxTab) switchTab(currentTab + 1);
+                } else {
+                    if(currentTab > 0) switchTab(currentTab - 1);
+                }
+            }
+        }, {passive: true});
+
+        function getSafeLogs() {
+            try {
+                var str = window.localStorage.getItem('all_logs');
+                if(!str) return [];
+                var parsed = JSON.parse(str);
+                return Array.isArray(parsed) ? pruneOldestLogs(parsed, '', MAX_LOCAL_LOGS) : [];
+            } catch(e) {
+                return []; 
+            }
+        }
+
+        function getStore(k) { try { return window.localStorage.getItem(k); } catch(e){ return null; } }
+        function setStore(k, v) {
+            try {
+                window.localStorage.setItem(k, v);
+                return true;
+            } catch(e) {
+                return false;
+            }
+        }
+
+        function removeCompletedReceiptPhotos(logs, preserveLogId) {
+            var removed = 0;
+            for(var i=0; i<logs.length; i++) {
+                var log = logs[i];
+                if(!log || String(log.id || '') === String(preserveLogId || '') || log.sent === false || !Array.isArray(log.expenses)) continue;
+                for(var j=0; j<log.expenses.length; j++) {
+                    if(log.expenses[j] && log.expenses[j].photo) {
+                        log.expenses[j].photo = '';
+                        removed++;
+                    }
+                }
+            }
+            return removed;
+        }
+
+        function cleanupCompletedReceiptPhotos() {
+            var logs = getSafeLogs();
+            if(!logs.length) return 0;
+            var removed = removeCompletedReceiptPhotos(logs, '');
+            logs = pruneOldestLogs(logs, '', MAX_LOCAL_LOGS);
+            if(removed > 0 || logs.length >= MAX_LOCAL_LOGS) setStore('all_logs', JSON.stringify(logs));
+            return removed;
+        }
+
+        function getLogStorageTime(log) {
+            var updated = Number(log && log.updatedAt) || 0;
+            if(updated > 0) return updated;
+            var idTime = parseInt(log && log.id, 10) || 0;
+            if(idTime > 100000000000) return idTime;
+            var dateTime = Date.parse(log && log.date ? log.date : '') || 0;
+            return dateTime;
+        }
+
+        function pruneOldestLogs(logs, preserveLogId, limit) {
+            var list = Array.isArray(logs) ? logs : [];
+            var max = Math.max(1, parseInt(limit, 10) || MAX_LOCAL_LOGS);
+            while(list.length > max) {
+                var oldestIndex = -1, oldestTime = Number.MAX_VALUE;
+                for(var i=0; i<list.length; i++) {
+                    if(String(list[i] && list[i].id || '') === String(preserveLogId || '')) continue;
+                    var time = getLogStorageTime(list[i]);
+                    if(time < oldestTime) { oldestTime = time; oldestIndex = i; }
+                }
+                if(oldestIndex < 0) break;
+                list.splice(oldestIndex, 1);
+            }
+            list.sort(function(a, b) { return getLogStorageTime(a) - getLogStorageTime(b); });
+            return list;
+        }
+
+        function saveLogs(logs, preservePhotoLogId) {
+            // 전송이 끝난 과거 영수증 사진은 구글 드라이브에 있으므로 휴대폰 임시저장소에서는 비웁니다.
+            // 현재 작성 중인 일지의 사진은 전송이 끝날 때까지 그대로 보존합니다.
+            removeCompletedReceiptPhotos(logs, preservePhotoLogId);
+            var compactLogs = pruneOldestLogs(logs, preservePhotoLogId, MAX_LOCAL_LOGS);
+            if(setStore('all_logs', JSON.stringify(compactLogs))) return true;
+
+            // iPhone 저장공간이 빡빡하면 현재 작성 건을 남기고 오래된 일지를 한 건씩 줄여 재시도합니다.
+            while(compactLogs.length > 1) {
+                var before = compactLogs.length;
+                pruneOldestLogs(compactLogs, preservePhotoLogId, compactLogs.length - 1);
+                if(compactLogs.length === before) break;
+                if(setStore('all_logs', JSON.stringify(compactLogs))) return true;
+            }
+            alert("현재 일지의 영수증 사진을 저장할 공간이 부족합니다.\n브라우저의 다른 큰 다운로드 파일을 정리한 뒤 다시 눌러주세요.");
+            return false;
+        }
+        function setToday() { var d = new Date(), m = ('0' + (d.getMonth() + 1)).slice(-2), day = ('0' + d.getDate()).slice(-2); document.getElementById('i_date').value = d.getFullYear() + '-' + m + '-' + day; }
+        function normalizeWeather(value) {
+            var text = String(value || '').replace(/^\s+|\s+$/g, '');
+            if(text.indexOf('맑음') !== -1) return '맑음';
+            if(text.indexOf('흐림') !== -1) return '흐림';
+            if(text.indexOf('비') !== -1) return '비';
+            if(text.indexOf('눈') !== -1) return '눈';
+            return text || '맑음';
+        }
+        function formatWorkDate(value) {
+            var text = String(value || '').replace(/^\s+|\s+$/g, '');
+            var match = text.match(/^(\d{2}|\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/);
+            if(!match) return text;
+            var year = parseInt(match[1], 10);
+            if(match[1].length === 2) year += 2000;
+            var month = parseInt(match[2], 10), day = parseInt(match[3], 10);
+            var checked = new Date(Date.UTC(year, month - 1, day));
+            if(checked.getUTCFullYear() !== year || checked.getUTCMonth() !== month - 1 || checked.getUTCDate() !== day) return text;
+            var weekdays = ['일','월','화','수','목','금','토'];
+            return String(year).slice(-2) + '-' + ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2) + ' ' + weekdays[checked.getUTCDay()];
+        }
+        function loadCount() {
+            var w = document.getElementById('i_writer').value;
+            var period = getWorkYearMonth(document.getElementById('i_date').value) || getWorkYearMonth(new Date());
+            var counterKey = getMonthlyCounterKey(w, period);
+            var storedNext = parseInt(getStore(counterKey), 10) || 1;
+            var logs = getSafeLogs(), maxSequence = 0, monthlyLogCount = 0;
+            for(var i=0; i<logs.length; i++) {
+                var logPeriod = getWorkYearMonth(logs[i].date);
+                if(logs[i].w !== w || !logPeriod || logPeriod.key !== period.key) continue;
+                monthlyLogCount++;
+                var parsedNumber = parseLogNumber(logs[i].num || logs[i].baseNum, logs[i].date);
+                if(parsedNumber && parsedNumber.month === period.month) {
+                    maxSequence = Math.max(maxSequence, parsedNumber.sequence);
+                }
+            }
+            var next = Math.max(storedNext, maxSequence + 1, monthlyLogCount + 1, 1);
+            document.getElementById('i_count').value = formatBaseLogNumber(period.month, next);
+            setStore(counterKey, String(next));
+        }
+        function rememberCurrentWriter() { setStore('lastW', document.getElementById('i_writer').value); }
+        function saveWriter() { if(!currentLogId) loadCount(); }
+        function calcCount(amt) {
+            if(currentLogId) return;
+            var period = getWorkYearMonth(document.getElementById('i_date').value) || getWorkYearMonth(new Date());
+            var el = document.getElementById('i_count');
+            var parsedNumber = parseLogNumber(el.value, document.getElementById('i_date').value);
+            var currentSequence = parsedNumber ? parsedNumber.sequence : 1;
+            if(currentSequence + amt > 0) currentSequence += amt;
+            el.value = formatBaseLogNumber(period.month, currentSequence);
+            setStore(getMonthlyCounterKey(document.getElementById('i_writer').value, period), String(currentSequence));
+        }
+        function getWorkYearMonth(value) {
+            var year, month;
+            if(value instanceof Date && !isNaN(value.getTime())) {
+                year = value.getFullYear(); month = value.getMonth() + 1;
+            } else {
+                var match = String(value || '').match(/^\s*(\d{2}|\d{4})[-\/.](\d{1,2})/);
+                if(!match) return null;
+                year = parseInt(match[1], 10); if(match[1].length === 2) year += 2000;
+                month = parseInt(match[2], 10);
+            }
+            if(month < 1 || month > 12) return null;
+            return {year:year, month:month, key:year + '-' + ('0' + month).slice(-2)};
+        }
+        function getMonthlyFileLabel(value) {
+            var period = getWorkYearMonth(value) || getWorkYearMonth(new Date());
+            return period.year + '년' + ('0' + period.month).slice(-2) + '월';
+        }
+        function getMonthlyCounterKey(writer, period) {
+            return 'cnt_' + writer + '_' + period.key;
+        }
+        function getBaseLogNumber(value, workDate) {
+            var parsed = parseLogNumber(value, workDate);
+            var period = getWorkYearMonth(workDate) || getWorkYearMonth(new Date());
+            if(!parsed) return formatBaseLogNumber(period.month, 1);
+            return formatBaseLogNumber(parsed.month, parsed.sequence);
+        }
+        function getRevisionFromLogNumber(value, workDate) {
+            var parsed = parseLogNumber(value, workDate);
+            return parsed ? parsed.revision : 0;
+        }
+        function parseLogNumber(value, workDate) {
+            var text = String(value || '').replace(/^\s+|\s+$/g, '');
+            var match = text.match(/^(\d{1,2})월(\d+)번(?:-(\d+))?$/);
+            if(!match) match = text.match(/^(\d{1,2})-(\d+)(?:-(\d+))?$/);
+            if(match) {
+                return {
+                    month:parseInt(match[1], 10),
+                    sequence:Math.max(1, parseInt(match[2], 10) || 1),
+                    revision:Math.max(0, parseInt(match[3], 10) || 0)
+                };
+            }
+            var legacy = text.match(/^(\d+)$/);
+            var period = getWorkYearMonth(workDate) || getWorkYearMonth(new Date());
+            if(!legacy || !period) return null;
+            return {month:period.month, sequence:Math.max(1, parseInt(legacy[1], 10) || 1), revision:0};
+        }
+        function formatBaseLogNumber(month, sequence) {
+            return parseInt(month, 10) + '월' + Math.max(1, parseInt(sequence, 10) || 1) + '번';
+        }
+        function formatRevisionNumber(baseNum, revision) {
+            return revision > 0 ? String(baseNum) + '-' + revision : String(baseNum);
+        }
+        function findLogById(logs, id) {
+            for(var i=0; i<logs.length; i++) if(logs[i].id === id) return logs[i];
+            return null;
+        }
+        function getLogRevisionInfo(log, fallbackNumber) {
+            var raw = String((log && log.num) || fallbackNumber || '1');
+            var workDate = (log && log.date) || document.getElementById('i_date').value;
+            var baseNum = String((log && log.baseNum) || getBaseLogNumber(raw, workDate));
+            var revision = log && log.rev !== undefined ? parseInt(log.rev, 10) || 0 : getRevisionFromLogNumber(raw, workDate);
+            return {baseNum:baseNum, revision:revision, sent:!!log && log.sent !== false};
+        }
+        function getNextSendRevision(previousLog, currentNumber) {
+            var info = getLogRevisionInfo(previousLog, currentNumber);
+            var intendedRevision = info.sent ? info.revision + 1 : 0;
+            return {
+                baseNum: info.baseNum,
+                previousRevision: info.revision,
+                previouslySent: info.sent,
+                intendedRevision: intendedRevision,
+                previousDisplay: formatRevisionNumber(info.baseNum, info.sent ? info.revision : 0),
+                displayNumber: formatRevisionNumber(info.baseNum, intendedRevision)
+            };
+        }
+        function advanceStoredCount(baseNum) {
+            var period = getWorkYearMonth(document.getElementById('i_date').value) || getWorkYearMonth(new Date());
+            var parsed = parseLogNumber(baseNum, document.getElementById('i_date').value);
+            var sequence = parsed ? parsed.sequence : 1;
+            setStore(getMonthlyCounterKey(document.getElementById('i_writer').value, period), String(sequence + 1));
+        }
+        function markLogSendSucceeded(context) {
+            if(!context) return;
+            var logs = getSafeLogs();
+            var log = findLogById(logs, context.id);
+            if(log) {
+                log.baseNum = context.baseNum;
+                log.rev = context.intendedRevision;
+                log.sent = true;
+                log.num = context.displayNumber;
+                log.updatedAt = new Date().getTime();
+                removeCompletedReceiptPhotos([log], '');
+                saveLogs(logs, context.id);
+            }
+            var counterWriter = context.writer || document.getElementById('i_writer').value;
+            var period = getWorkYearMonth(document.getElementById('i_date').value) || getWorkYearMonth(new Date());
+            var counterKey = getMonthlyCounterKey(counterWriter, period);
+            var storedNext = parseInt(getStore(counterKey), 10) || 1;
+            var parsed = parseLogNumber(context.baseNum, document.getElementById('i_date').value);
+            var assignedNext = (parsed ? parsed.sequence : 1) + 1;
+            setStore(counterKey, String(Math.max(storedNext, assignedNext)));
+            document.getElementById('i_count').value = context.displayNumber;
+        }
+        function markLogSendFailed(context) {
+            if(!context) return;
+            var logs = getSafeLogs();
+            var log = findLogById(logs, context.id);
+            if(log) {
+                log.num = context.previousDisplay;
+                log.rev = context.previousRevision;
+                log.sent = context.previouslySent;
+                log.updatedAt = new Date().getTime();
+                saveLogs(logs, context.id);
+            }
+            document.getElementById('i_count').value = context.previousDisplay;
+        }
+        
+        window.addEventListener('load', function() {
+            cleanupCompletedReceiptPhotos();
+            setToday();
+            var lastWriter = getStore('lastW');
+            if(!lastWriter) {
+                var savedLogs = getSafeLogs();
+                if(savedLogs.length) lastWriter = savedLogs[savedLogs.length - 1].w || '';
+            }
+            if(lastWriter) {
+                var writerSelect = document.getElementById('i_writer');
+                for(var i=0; i<writerSelect.options.length; i++) {
+                    if(writerSelect.options[i].value === lastWriter) { writerSelect.value = lastWriter; break; }
+                }
+            }
+            loadCount();
+        });
+
+        function toggleCustomName(kind) {
+            var choice = document.getElementById(kind + '_name_choice');
+            var custom = document.getElementById(kind + '_name_custom');
+            var isCustom = choice.value === '__custom__';
+            custom.style.display = isCustom ? 'block' : 'none';
+            if(isCustom) custom.focus();
+            else custom.value = '';
+        }
+
+        function getChosenName(kind) {
+            var choice = document.getElementById(kind + '_name_choice');
+            var custom = document.getElementById(kind + '_name_custom');
+            var value = choice.value === '__custom__' ? custom.value : choice.value;
+            return String(value || '').replace(/^\s+|\s+$/g, '');
+        }
+
+        function resetNamePicker(kind) {
+            document.getElementById(kind + '_name_choice').value = '';
+            var custom = document.getElementById(kind + '_name_custom');
+            custom.value = '';
+            custom.style.display = 'none';
+        }
+
+        function clearPendingInputs() {
+            ['eq_cost', 'ex_desc', 'ex_amt'].forEach(function(id) { document.getElementById(id).value = ''; });
+            resetNamePicker('w');
+            resetNamePicker('eq');
+            document.getElementById('ex_file').value = '';
+            document.getElementById('pBox').style.display = 'none';
+            document.getElementById('pImg').removeAttribute('src');
+            document.getElementById('w_type').value = '전일';
+            document.getElementById('eq_type').value = '자체동원';
+            document.getElementById('ex_cat').value = '중식';
+            var card = document.querySelector('input[name="payType"][value="카드"]');
+            if(card) card.checked = true;
+        }
+
+        function clearFormForNewLog() {
+            document.getElementById('successOverlay').style.display = 'none';
+            document.getElementById('localSaveConfirmOverlay').style.display = 'none';
+            document.getElementById('kakaoConfirmOverlay').style.display = 'none';
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('loadingOverlay').style.display = 'none';
+            isProcessing = false;
+            document.getElementById('sendAllButton').disabled = false;
+            currentLogId = null; document.getElementById('editAlert').style.display = 'none';
+            ['i_site', 'i_days', 'i_prog', 'i_note'].forEach(function(id) { document.getElementById(id).value = ''; });
+            workers = []; equips = []; expenses = []; tempPhotoData = ""; clearPendingInputs();
+            renderW(); renderEq(); renderEx(); setToday(); loadCount();
+            switchTab(0);
+        }
+
+        function resetForm() {
+            if(!confirm("새 일지를 작성하시겠습니까?\n(저장하지 않은 데이터는 사라집니다)")) return;
+            clearFormForNewLog();
+        }
+
+        function renderW() {
+            var ul = document.getElementById('list_w'); ul.innerHTML = ''; document.getElementById('cnt_w').innerText = workers.length;
+            for(var i=0; i<workers.length; i++) {
+                var w = workers[i], li = document.createElement('li'); li.className = "list-item";
+                var info = document.createElement('div');
+                var name = document.createElement('b'); name.textContent = w.name;
+                var type = document.createElement('span'); type.className = 'badge'; type.style.cssText = 'background:#ffedd5; color:#9a3412;'; type.textContent = w.type;
+                info.appendChild(name); info.appendChild(document.createTextNode(' ')); info.appendChild(type); li.appendChild(info);
+                var btn = document.createElement('button'); btn.className = "del-btn"; btn.innerText = "삭제";
+                (function(idx){ btn.onclick = function(){ workers.splice(idx,1); renderW(); } })(i); li.appendChild(btn); ul.appendChild(li);
+            }
+        }
+        function addWorker() {
+            var n = getChosenName('w'), t = document.getElementById('w_type').value;
+            if(n === "") return alert("작업자를 선택하거나 이름을 직접 입력해주세요.");
+            workers.push({name: n, type: t, txt: n+"("+t+")"});
+            renderW(); resetNamePicker('w');
+        }
+
+        function renderEq() {
+            var ul = document.getElementById('list_eq'); ul.innerHTML = '';
+            for(var i=0; i<equips.length; i++) {
+                var e = equips[i], li = document.createElement('li'); li.className = "list-item";
+                var costTxt = e.cost > 0 ? e.cost.toLocaleString() + '원' : '-';
+                var info = document.createElement('div');
+                var name = document.createElement('b'); name.textContent = e.name;
+                var type = document.createElement('span'); type.className = 'badge'; type.style.cssText = 'background:#f3e8ff; color:#6b21a8;'; type.textContent = e.type;
+                info.appendChild(name); info.appendChild(document.createTextNode(' ')); info.appendChild(type);
+                var costBox = document.createElement('div'); var cost = document.createElement('b'); cost.textContent = costTxt; costBox.appendChild(cost);
+                li.appendChild(info); li.appendChild(costBox);
+                var btn = document.createElement('button'); btn.className = "del-btn"; btn.innerText = "삭제";
+                (function(idx){ btn.onclick = function(){ equips.splice(idx,1); renderEq(); } })(i); li.appendChild(btn); ul.appendChild(li);
+            }
+        }
+        function addEquip() { 
+            var t = document.getElementById('eq_type').value;
+            var n = getChosenName('eq');
+            var c = parseInt(document.getElementById('eq_cost').value || 0, 10); 
+            if(n === "") return alert("장비를 선택하거나 장비명을 직접 입력해주세요."); 
+            if(isNaN(c) || c < 0) return alert("장비 비용은 0원 이상으로 입력해주세요.");
+            var cTxt = c > 0 ? "("+c+"원)" : "";
+            equips.push({type: t, name: n, cost: c, txt: "["+t+"]"+n+cTxt}); 
+            renderEq(); resetNamePicker('eq'); document.getElementById('eq_cost').value = ''; 
+        }
+
+        function requestExpensePhoto() {
+            var category = document.getElementById('ex_cat').value;
+            var descInput = document.getElementById('ex_desc');
+            var description = descInput.value.replace(/^\s+|\s+$/g, '');
+            if((category === '자재대' || category === '기타') && description === '') {
+                alert('[' + category + '] 항목은 사진 촬영 전에 내용을 먼저 입력해주세요.');
+                descInput.focus();
+                return;
+            }
+
+            var amountInput = document.getElementById('ex_amt');
+            var amount = parseInt(amountInput.value || 0, 10);
+            if(isNaN(amount) || amount <= 0) {
+                alert('사진 촬영 전에 금액을 1원 이상 입력해주세요.');
+                amountInput.focus();
+                return;
+            }
+            document.getElementById('ex_file').click();
+        }
+
+        function previewImg(input) { 
+            var box = document.getElementById('pBox'), img = document.getElementById('pImg'); 
+            if(input.files && input.files[0]) { 
+                var file = input.files[0];
+                if(file.size > 20 * 1024 * 1024) {
+                    input.value = '';
+                    return alert("사진 용량이 너무 큽니다. 20MB 이하의 사진을 선택해주세요.");
+                }
+                var image = new Image();
+                var objectUrl = URL.createObjectURL(file);
+                image.onload = function() {
+                    try {
+                        var cvs = document.createElement('canvas');
+                        var maxSize = 900;
+                        var ratio = Math.min(1, maxSize / Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height));
+                        var width = Math.max(1, Math.round((image.naturalWidth || image.width) * ratio));
+                        var height = Math.max(1, Math.round((image.naturalHeight || image.height) * ratio));
+                        cvs.width = width; cvs.height = height;
+                        var ctx = cvs.getContext('2d');
+                        if(!ctx) throw new Error('canvas');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(image, 0, 0, width, height);
+                        tempPhotoData = cvs.toDataURL('image/jpeg', 0.62);
+                        img.src = tempPhotoData;
+                        box.style.display = 'block';
+                        addExpense(true);
+                    } catch(e) {
+                        tempPhotoData = '';
+                        input.value = '';
+                        box.style.display = 'none';
+                        alert("사진을 처리하지 못했습니다. 다른 사진을 선택해주세요.");
+                    } finally {
+                        URL.revokeObjectURL(objectUrl);
+                    }
+                };
+                image.onerror = function() {
+                    URL.revokeObjectURL(objectUrl);
+                    tempPhotoData = '';
+                    input.value = '';
+                    box.style.display = 'none';
+                    alert("이 사진 형식은 현재 브라우저에서 열 수 없습니다. JPG 또는 PNG 사진을 선택해주세요.");
+                };
+                image.src = objectUrl;
+            } else { 
+                box.style.display = 'none'; 
+                tempPhotoData = ""; 
+            } 
+        }
+
+        function renderEx() {
+            var ul = document.getElementById('list_ex'), tot = 0; ul.innerHTML = '';
+            for(var i=0; i<expenses.length; i++) {
+                var e = expenses[i]; tot += e.amt; var li = document.createElement('li'); li.className = "list-item"; li.style.alignItems = "flex-start";
+                var cCls = e.pt === '카드' ? 'background:#dbeafe; color:#1e40af;' : 'background:#dcfce7; color:#166534;';
+                var dTxt = e.desc ? e.desc : ""; 
+                var info = document.createElement('div');
+                var payBadge = document.createElement('span'); payBadge.className = 'badge'; payBadge.style.cssText = cCls + ' margin-left:0; margin-right:4px;'; payBadge.textContent = e.pt;
+                var category = document.createElement('b'); category.textContent = e.cat;
+                var description = document.createElement('span'); description.style.cssText = 'font-size:11px; color:#6b7280; margin-left:4px;'; description.textContent = dTxt;
+                info.appendChild(payBadge); info.appendChild(category); info.appendChild(description);
+                if(e.photo) {
+                    var photoBadge = document.createElement('span'); photoBadge.className = 'badge'; photoBadge.style.cssText = 'background:#e9d5ff; color:#7e22ce;'; photoBadge.textContent = '📸사진'; info.appendChild(photoBadge);
+                    var photoBox = document.createElement('div'); photoBox.style.marginTop = '4px';
+                    var photo = document.createElement('img'); photo.src = e.photo; photo.alt = '첨부된 영수증'; photo.style.cssText = 'height:50px; border-radius:4px; border:1px solid #ccc;'; photoBox.appendChild(photo); info.appendChild(photoBox);
+                }
+                var amountBox = document.createElement('div'); var amount = document.createElement('b'); amount.textContent = e.amt.toLocaleString() + '원'; amountBox.appendChild(amount);
+                li.appendChild(info); li.appendChild(amountBox);
+                var btn = document.createElement('button'); btn.className = "del-btn"; btn.innerText = "삭제"; btn.style.marginTop = "4px";
+                (function(idx){ btn.onclick = function(){ expenses.splice(idx,1); renderEx(); } })(i); amountBox.appendChild(document.createElement('br')); amountBox.appendChild(btn); ul.appendChild(li);
+            }
+            document.getElementById('cnt_ex').innerText = tot.toLocaleString();
+        }
+
+        function addExpense(fromPhoto) {
+            var radios = document.getElementsByName('payType'), pt = '카드'; for(var i=0; i<radios.length; i++) { if(radios[i].checked){ pt = radios[i].value; break; } }
+            var c = document.getElementById('ex_cat').value;
+            var dInput = document.getElementById('ex_desc');
+            var d = dInput.value.replace(/^\s+|\s+$/g, '');
+            var a = parseInt(document.getElementById('ex_amt').value || 0, 10);
+            
+            if(isNaN(a) || a <= 0) return alert("금액은 1원 이상으로 정확히 입력하세요.");
+            if((c === '자재대' || c === '기타') && d === "") return alert("[" + c + "] 항목은 세부 내용을 반드시 입력해야 합니다.");
+
+            if(!tempPhotoData) {
+                return alert("📸 영수증 사진을 반드시 촬영하거나 첨부해야 경비를 등록할 수 있습니다!");
+            }
+
+            var dFormat = d !== "" ? "-" + d : ""; 
+            var txt = "["+pt+"]"+c+dFormat+"("+a+"원)"; 
+            
+            expenses.push({pt: pt, cat: c, desc: d, amt: a, photo: tempPhotoData, txt: txt}); 
+            renderEx();
+            
+            dInput.value = ''; document.getElementById('ex_amt').value = ''; 
+            document.getElementById('ex_file').value = ''; 
+            document.getElementById('pBox').style.display = 'none'; 
+            document.getElementById('pImg').src = '';
+            tempPhotoData = ""; 
+        }
+
+        function openModal() {
+            var logs = getSafeLogs(); 
+            var ul = document.getElementById('list_saved'); ul.innerHTML = '';
+            if(logs.length === 0) { document.getElementById('noLogs').style.display = 'block'; } 
+            else {
+                document.getElementById('noLogs').style.display = 'none';
+                for(var i=logs.length-1; i>=0; i--) {
+                    (function(l) {
+                        var li = document.createElement('li'); li.className = "list-item";
+                        var info = document.createElement('div');
+                        var title = document.createElement('div'); title.style.cssText = 'font-weight:bold; font-size:13px;'; title.textContent = (l.date || '날짜 없음') + ' (' + (l.num || '-') + ')';
+                        var site = document.createElement('div'); site.style.cssText = 'font-size:12px; color:#6b7280;'; site.textContent = l.site || '현장명 없음';
+                        info.appendChild(title); info.appendChild(site); li.appendChild(info);
+                        var actionBox = document.createElement('div'); actionBox.className = 'saved-log-actions';
+                        var btn = document.createElement('button'); btn.className="btn-sm"; btn.style.background="#dbeafe"; btn.style.color="#1e40af"; btn.innerText="열기";
+                        btn.onclick = function() {
+                            currentLogId = l.id; document.getElementById('editAlert').style.display='block';
+                            document.getElementById('i_writer').value = l.w || ''; document.getElementById('i_count').value = l.num || '';
+                            document.getElementById('i_date').value = l.date || ''; document.getElementById('i_weather').value = normalizeWeather(l.wea);
+                            document.getElementById('i_site').value = l.site || ''; document.getElementById('i_days').value = l.days || '';
+                            document.getElementById('i_prog').value = l.prog || ''; document.getElementById('i_note').value = l.note || '';
+                            workers = l.workers ? JSON.parse(JSON.stringify(l.workers)) : [];
+                            equips = l.equips ? JSON.parse(JSON.stringify(l.equips)) : [];
+                            expenses = l.expenses ? JSON.parse(JSON.stringify(l.expenses)) : [];
+                            tempPhotoData = ""; 
+                            renderW(); renderEq(); renderEx(); closeModal(); 
+                            switchTab(0); 
+                        };
+                        var deleteBtn = document.createElement('button'); deleteBtn.className = 'del-btn'; deleteBtn.innerText = '삭제';
+                        deleteBtn.onclick = function() { deleteSavedLog(l.id); };
+                        actionBox.appendChild(btn); actionBox.appendChild(deleteBtn); li.appendChild(actionBox); ul.appendChild(li);
+                    })(logs[i]);
+                }
+            } document.getElementById('modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function deleteSavedLog(id) {
+            var logs = getSafeLogs();
+            var target = findLogById(logs, id);
+            if(!target) return alert("삭제할 일지를 찾지 못했습니다.");
+            var label = (target.date || '날짜 없음') + ' (' + (target.num || '-') + ')';
+            if(!confirm(label + " 일지를 이 기기에서 삭제하시겠습니까?\n삭제한 이전 일지는 복구할 수 없습니다.\n구글 드라이브 자료는 삭제되지 않습니다.")) return;
+
+            var remaining = [];
+            for(var i=0; i<logs.length; i++) {
+                if(logs[i].id !== id) remaining.push(logs[i]);
+            }
+            if(!saveLogs(remaining)) return;
+            if(currentLogId === id) {
+                currentLogId = null;
+                document.getElementById('editAlert').style.display = 'none';
+            }
+            openModal();
+            alert("✅ 선택한 이전 일지를 이 기기에서 삭제했습니다.");
+        }
+
+        function deleteAllSavedLogs() {
+            var logs = getSafeLogs();
+            if(logs.length === 0) return alert("삭제할 이전 일지가 없습니다.");
+            if(!confirm("이 기기에 임시저장된 이전 일지 " + logs.length + "건을 모두 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.\n구글 드라이브 자료는 삭제되지 않습니다.")) return;
+            if(!saveLogs([])) return;
+            currentLogId = null;
+            document.getElementById('editAlert').style.display = 'none';
+            openModal();
+            alert("✅ 이 기기에 저장된 이전 일지를 모두 삭제했습니다.");
+        }
+
+        function escapeCSV(val) {
+            if(val === null || val === undefined || val === "") return "";
+            var s = String(val).replace(/"/g, '""');
+            return '"' + s + '"';
+        }
+
+        function generateCSVString(logs) {
+            logs = logs || getSafeLogs();
+            if(logs.length === 0) return null;
+            
+            var head = ["작업날짜","작성자","일지번호","날씨","현장명","누적작업일","진행율(%)", "작업자","근무시간", "자체장비","비용", "외부장비","비용", "카드경비","내용","금액", "현금경비","내용","금액", "총경비(원)","현금사용합계(원)","반입자재 및 특기사항"];
+            var csv = head.join(',') + "\n";
+
+            for(var r=0; r<logs.length; r++) {
+                var lg = logs[r];
+                var eq_in = [], eq_out = [], ex_card = [], ex_cash = [];
+                var tot = 0, cashTot = 0;
+
+                if(lg.equips) {
+                    for(var q=0; q<lg.equips.length; q++) {
+                        if(lg.equips[q].type === '자체동원') eq_in.push(lg.equips[q]);
+                        else eq_out.push(lg.equips[q]);
+                    }
+                }
+
+                if(lg.expenses) {
+                    for(var x=0; x<lg.expenses.length; x++) {
+                        tot += lg.expenses[x].amt;
+                        if(lg.expenses[x].pt === '카드') ex_card.push(lg.expenses[x]);
+                        else {
+                            ex_cash.push(lg.expenses[x]);
+                            cashTot += lg.expenses[x].amt;
+                        }
+                    }
+                }
+
+                var tWorkers = lg.workers || [];
+                var maxRows = Math.max(tWorkers.length, eq_in.length, eq_out.length, ex_card.length, ex_cash.length);
+                if(maxRows === 0) maxRows = 1; 
+
+                for(var i=0; i<maxRows; i++) {
+                    var row = [];
+
+                    if(i === 0) {
+                        row.push(escapeCSV(formatWorkDate(lg.date)), escapeCSV(lg.w), escapeCSV(lg.num), escapeCSV(normalizeWeather(lg.wea)), escapeCSV(lg.site), escapeCSV(lg.days), escapeCSV(lg.prog));
+                    } else {
+                        row.push("","","","","","","");
+                    }
+
+                    if(i < tWorkers.length) {
+                        row.push(escapeCSV(tWorkers[i].name), escapeCSV(tWorkers[i].type));
+                    } else {
+                        row.push("","");
+                    }
+
+                    if(i < eq_in.length) {
+                        row.push(escapeCSV(eq_in[i].name), eq_in[i].cost > 0 ? eq_in[i].cost : "");
+                    } else {
+                        row.push("","");
+                    }
+
+                    if(i < eq_out.length) {
+                        row.push(escapeCSV(eq_out[i].name), eq_out[i].cost > 0 ? eq_out[i].cost : "");
+                    } else {
+                        row.push("","");
+                    }
+
+                    if(i < ex_card.length) {
+                        row.push(escapeCSV(ex_card[i].cat), escapeCSV(ex_card[i].desc), ex_card[i].amt > 0 ? ex_card[i].amt : "");
+                    } else {
+                        row.push("","","");
+                    }
+
+                    if(i < ex_cash.length) {
+                        row.push(escapeCSV(ex_cash[i].cat), escapeCSV(ex_cash[i].desc), ex_cash[i].amt > 0 ? ex_cash[i].amt : "");
+                    } else {
+                        row.push("","","");
+                    }
+
+                    if(i === 0) {
+                        row.push(tot, cashTot, escapeCSV(lg.note));
+                    } else {
+                        row.push("","","");
+                    }
+
+                    csv += row.join(',') + "\n";
+                }
+            }
+            return csv;
+        }
+
+        function parseCSVRows(csv) {
+            var rows = [], row = [], cell = '', inQuotes = false;
+            for(var i=0; i<csv.length; i++) {
+                var ch = csv.charAt(i);
+                if(inQuotes) {
+                    if(ch === '"' && csv.charAt(i + 1) === '"') { cell += '"'; i++; }
+                    else if(ch === '"') inQuotes = false;
+                    else cell += ch;
+                } else if(ch === '"') inQuotes = true;
+                else if(ch === ',') { row.push(cell); cell = ''; }
+                else if(ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+                else if(ch !== '\r') cell += ch;
+            }
+            if(cell !== '' || row.length > 0) { row.push(cell); rows.push(row); }
+            if(rows.length && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === '') rows.pop();
+            return rows;
+        }
+
+        function xmlEscape(value) {
+            return String(value === null || value === undefined ? '' : value)
+                .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+        }
+
+        function excelColumnName(index) {
+            var name = '';
+            index++;
+            while(index > 0) {
+                var remainder = (index - 1) % 26;
+                name = String.fromCharCode(65 + remainder) + name;
+                index = Math.floor((index - 1) / 26);
+            }
+            return name;
+        }
+
+        function makeWorksheetXml(rows) {
+            var numericColumns = {2:true, 5:true, 6:true, 10:true, 12:true, 15:true, 18:true, 19:true, 20:true};
+            var widthPixels = [92,55,55,55,180,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,250];
+            var sectionStartColumns = {7:true, 9:true, 11:true, 13:true, 16:true, 19:true, 21:true};
+            var lastColumn = excelColumnName(Math.max(0, (rows[0] || []).length - 1));
+            var logMergeRanges = [], logGroupStart = null;
+            function addLogMergeRanges(startIndex, endIndex) {
+                if(startIndex === null || endIndex <= startIndex) return;
+                for(var mc=0; mc<=6; mc++) {
+                    var mergeColumn = excelColumnName(mc);
+                    logMergeRanges.push(mergeColumn + (startIndex + 1) + ':' + mergeColumn + (endIndex + 1));
+                }
+                logMergeRanges.push('V' + (startIndex + 1) + ':V' + (endIndex + 1));
+            }
+            for(var mr=1; mr<rows.length; mr++) {
+                if(String((rows[mr] || [])[0] || '').replace(/^\s+|\s+$/g, '') !== '') {
+                    if(logGroupStart !== null) addLogMergeRanges(logGroupStart, mr - 1);
+                    logGroupStart = mr;
+                }
+            }
+            if(logGroupStart !== null) addLogMergeRanges(logGroupStart, rows.length - 1);
+            var xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+                '<dimension ref="A1:' + lastColumn + Math.max(1, rows.length) + '"/>' +
+                '<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews>' +
+                '<sheetFormatPr defaultRowHeight="30"/><cols>';
+            for(var w=0; w<widthPixels.length; w++) {
+                var excelWidth = Math.round(((widthPixels[w] - 5) / 7) * 100) / 100;
+                xml += '<col min="' + (w + 1) + '" max="' + (w + 1) + '" width="' + excelWidth + '" customWidth="1"/>';
+            }
+            xml += '</cols><sheetData>';
+
+            var lastDate = '';
+            for(var r=0; r<rows.length; r++) {
+                var currentDate = r > 0 ? String(rows[r][0] || '').replace(/^\s+|\s+$/g, '') : '';
+                var dateBoundary = r > 1 && currentDate !== '' && lastDate !== '' && currentDate !== lastDate;
+                if(currentDate !== '') lastDate = currentDate;
+                xml += '<row r="' + (r + 1) + '" ht="' + (r === 0 ? '67.5' : '30') + '" customHeight="1">';
+                for(var c=0; c<rows[r].length; c++) {
+                    var value = rows[r][c];
+                    var ref = excelColumnName(c) + (r + 1);
+                    var isNumeric = r > 0 && numericColumns[c] && /^-?\d+(?:\.\d+)?$/.test(value);
+                    var isSectionStart = !!sectionStartColumns[c];
+                    var isSundayDateCell = r > 0 && c === 0 && /\s일$/.test(currentDate);
+                    var styleId;
+                    if(r === 0) styleId = isSectionStart ? 5 : 1;
+                    else if(isSundayDateCell) styleId = dateBoundary ? 11 : 10;
+                    else if(dateBoundary && isSectionStart) styleId = isNumeric ? 9 : 8;
+                    else if(dateBoundary) styleId = isNumeric ? 7 : 6;
+                    else if(isSectionStart) styleId = isNumeric ? 4 : 3;
+                    else styleId = isNumeric ? 2 : 0;
+                    if(value === '') {
+                        xml += '<c r="' + ref + '" s="' + styleId + '"/>';
+                    } else if(isNumeric) {
+                        xml += '<c r="' + ref + '" s="' + styleId + '"><v>' + value + '</v></c>';
+                    } else {
+                        xml += '<c r="' + ref + '" t="inlineStr" s="' + styleId + '"><is><t xml:space="preserve">' + xmlEscape(value) + '</t></is></c>';
+                    }
+                }
+                xml += '</row>';
+            }
+            xml += '</sheetData><autoFilter ref="A1:' + lastColumn + Math.max(1, rows.length) + '"/>';
+            if(logMergeRanges.length) {
+                xml += '<mergeCells count="' + logMergeRanges.length + '">';
+                for(var mi=0; mi<logMergeRanges.length; mi++) xml += '<mergeCell ref="' + logMergeRanges[mi] + '"/>';
+                xml += '</mergeCells>';
+            }
+            xml += '<pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/></worksheet>';
+            return xml;
+        }
+
+        function makeXlsxBytes(csvStr) {
+            var rows = parseCSVRows(csvStr);
+            var created = new Date().toISOString();
+            var contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>';
+            var rootRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>';
+            var workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView xWindow="0" yWindow="0" windowWidth="18000" windowHeight="10000"/></bookViews><sheets><sheet name="작업일지" sheetId="1" r:id="rId1"/></sheets><calcPr calcId="191029"/></workbook>';
+            var workbookRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+            var styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><color theme="1"/><name val="맑은 고딕"/><family val="2"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="맑은 고딕"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF166534"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="5"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFD1D5DB"/></left><right style="thin"><color rgb="FFD1D5DB"/></right><top style="thin"><color rgb="FFD1D5DB"/></top><bottom style="thin"><color rgb="FFD1D5DB"/></bottom><diagonal/></border><border><left style="thick"><color rgb="FF166534"/></left><right style="thin"><color rgb="FFD1D5DB"/></right><top style="thin"><color rgb="FFD1D5DB"/></top><bottom style="thin"><color rgb="FFD1D5DB"/></bottom><diagonal/></border><border><left style="thin"><color rgb="FFD1D5DB"/></left><right style="thin"><color rgb="FFD1D5DB"/></right><top style="thick"><color rgb="FF166534"/></top><bottom style="thin"><color rgb="FFD1D5DB"/></bottom><diagonal/></border><border><left style="thick"><color rgb="FF166534"/></left><right style="thin"><color rgb="FFD1D5DB"/></right><top style="thick"><color rgb="FF166534"/></top><bottom style="thin"><color rgb="FFD1D5DB"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="10"><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFill="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="3" fontId="0" fillId="0" borderId="2" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="1" fillId="2" borderId="2" xfId="0" applyFill="1" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="3" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="3" fontId="0" fillId="0" borderId="3" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="4" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="3" fontId="0" fillId="0" borderId="4" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium2" defaultPivotStyle="PivotStyleLight16"/></styleSheet>';
+            styles = styles
+                .replace(/fillId="2"/g, 'fillId="0"')
+                .replace(/<color rgb="FFFFFFFF"/g, '<color rgb="FF111827"')
+                .replace(/FF166534/g, 'FF374151')
+                .replace(/<top style="thick"/g, '<top style="double"')
+                .replace('<fonts count="2">', '<fonts count="3">')
+                .replace('</fonts>', '<font><sz val="11"/><color rgb="FFDC2626"/><name val="맑은 고딕"/><family val="2"/></font></fonts>')
+                .replace('<cellXfs count="10">', '<cellXfs count="12">')
+                .replace('</cellXfs>', '<xf numFmtId="0" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="0" borderId="3" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf></cellXfs>');
+            var core = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>진흥녹화센터 작업일지</dc:title><dc:creator>진흥녹화센터 작업일지 앱</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">' + created + '</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">' + created + '</dcterms:modified></cp:coreProperties>';
+            var app = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>진흥녹화센터 작업일지 앱</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop><HeadingPairs><vt:vector size="2" baseType="variant"><vt:variant><vt:lpstr>워크시트</vt:lpstr></vt:variant><vt:variant><vt:i4>1</vt:i4></vt:variant></vt:vector></HeadingPairs><TitlesOfParts><vt:vector size="1" baseType="lpstr"><vt:lpstr>작업일지</vt:lpstr></vt:vector></TitlesOfParts></Properties>';
+            var xlsxEntries = [
+                {name:'[Content_Types].xml', bytes:utf8Bytes(contentTypes)},
+                {name:'_rels/.rels', bytes:utf8Bytes(rootRels)},
+                {name:'docProps/core.xml', bytes:utf8Bytes(core)},
+                {name:'docProps/app.xml', bytes:utf8Bytes(app)},
+                {name:'xl/workbook.xml', bytes:utf8Bytes(workbook)},
+                {name:'xl/_rels/workbook.xml.rels', bytes:utf8Bytes(workbookRels)},
+                {name:'xl/styles.xml', bytes:utf8Bytes(styles)},
+                {name:'xl/worksheets/sheet1.xml', bytes:utf8Bytes(makeWorksheetXml(rows))}
+            ];
+            return makeZipBytes(xlsxEntries);
+        }
+
+        function buildInputReviewText() {
+            var writer = document.getElementById('i_writer').value || "미입력";
+            var journalNumber = document.getElementById('i_count').value || "자동부여";
+            var workDate = formatWorkDate(document.getElementById('i_date').value) || "미입력";
+            var weather = normalizeWeather(document.getElementById('i_weather').value) || "미입력";
+            var site = document.getElementById('i_site').value || "미입력";
+            var workDays = document.getElementById('i_days').value;
+            var progress = document.getElementById('i_prog').value;
+            var note = document.getElementById('i_note').value || "없음";
+            var workerLines = [], equipLines = [], expenseLines = [];
+            var expenseTotal = 0;
+
+            for(var i=0; i<workers.length; i++) {
+                workerLines.push(" • " + workers[i].name + " / " + workers[i].type);
+            }
+            for(var j=0; j<equips.length; j++) {
+                var equipCost = Number(equips[j].cost) || 0;
+                equipLines.push(" • " + equips[j].name + " / " + equips[j].type + (equipCost > 0 ? " / " + equipCost.toLocaleString() + "원" : ""));
+            }
+            for(var k=0; k<expenses.length; k++) {
+                var amount = Number(expenses[k].amt) || 0;
+                expenseTotal += amount;
+                expenseLines.push(" • " + expenses[k].pt + " / " + expenses[k].cat + (expenses[k].desc ? " / " + expenses[k].desc : "") + " / " + amount.toLocaleString() + "원");
+            }
+
+            return "[기본정보]\n" +
+                   "작성자: " + writer + "\n" +
+                   "일지번호: " + journalNumber + "\n" +
+                   "날짜: " + workDate + "\n" +
+                   "날씨: " + weather + "\n" +
+                   "현장명: " + site + "\n" +
+                   "누적작업일: " + (workDays !== "" ? workDays + "일" : "미입력") + "\n" +
+                   "진행율: " + (progress !== "" ? progress + "%" : "미입력") + "\n\n" +
+                   "[작업자] 총 " + workers.length + "명\n" +
+                   (workerLines.length ? workerLines.join("\n") : " • 없음") + "\n\n" +
+                   "[장비] 총 " + equips.length + "대\n" +
+                   (equipLines.length ? equipLines.join("\n") : " • 없음") + "\n\n" +
+                   "[경비] 합계 " + expenseTotal.toLocaleString() + "원\n" +
+                   (expenseLines.length ? expenseLines.join("\n") : " • 없음") + "\n\n" +
+                   "[반입자재 및 특기사항]\n" + note;
+        }
+
+        function requestLocalSave() {
+            document.getElementById('localSaveConfirmText').textContent = buildInputReviewText();
+            document.getElementById('localSaveConfirmOverlay').style.display = 'flex';
+        }
+
+        function cancelLocalSave() {
+            document.getElementById('localSaveConfirmOverlay').style.display = 'none';
+        }
+
+        function confirmLocalSave() {
+            document.getElementById('localSaveConfirmOverlay').style.display = 'none';
+            saveLocalOnly();
+        }
+
+        function saveLocalOnly() {
+            try {
+                var logs = getSafeLogs(); 
+                var isNew = !currentLogId;
+                var previousLog = isNew ? null : findLogById(logs, currentLogId);
+                var revisionInfo = getLogRevisionInfo(previousLog, document.getElementById('i_count').value);
+                var obj = {
+                    id: currentLogId || new Date().getTime().toString(),
+                    updatedAt: new Date().getTime(),
+                    w: document.getElementById('i_writer').value,
+                    num: formatRevisionNumber(revisionInfo.baseNum, revisionInfo.sent ? revisionInfo.revision : 0),
+                    baseNum: revisionInfo.baseNum, rev: revisionInfo.revision, sent: revisionInfo.sent,
+                    date: document.getElementById('i_date').value, wea: document.getElementById('i_weather').value,
+                    site: document.getElementById('i_site').value, days: document.getElementById('i_days').value,
+                    prog: document.getElementById('i_prog').value, note: document.getElementById('i_note').value,
+                    workers: JSON.parse(JSON.stringify(workers)), equips: JSON.parse(JSON.stringify(equips)), expenses: JSON.parse(JSON.stringify(expenses))
+                };
+                if(isNew) {
+                    logs.push(obj);
+                    if(!saveLogs(logs, obj.id)) return;
+                    rememberCurrentWriter();
+                    currentLogId = obj.id; advanceStoredCount(obj.baseNum);
+                    alert("✅ 기기에 임시저장 되었습니다.\n(화면이 넘어가지 않으므로 계속 작성하실 수 있습니다.)");
+                } else {
+                    var localUpdated = false;
+                    for(var i=0; i<logs.length; i++) { if(logs[i].id === currentLogId) { logs[i] = obj; localUpdated = true; break; } }
+                    if(!localUpdated) logs.push(obj);
+                    if(!saveLogs(logs, obj.id)) return;
+                    rememberCurrentWriter();
+                    alert("✅ 수정된 내용이 기기에 안전하게 저장되었습니다.");
+                }
+            } catch(e) { alert("저장 실패: " + e.message); }
+        }
+
+        function shareKakaoSummary() {
+            var dt = formatWorkDate(document.getElementById('i_date').value) || "날짜미정";
+            var site = document.getElementById('i_site').value || "현장명 없음";
+            var progressValue = document.getElementById('i_prog').value;
+            var progressText = progressValue !== "" ? progressValue + "%" : "미입력";
+            var note = document.getElementById('i_note').value || "없음";
+
+            var workerNameList = [], extEqList = [];
+            for(var j=0; j<workers.length; j++) {
+                workerNameList.push(workers[j].name);
+            }
+            for(var i=0; i<equips.length; i++) {
+                if(equips[i].type === '외부임차') {
+                    extEqList.push(equips[i].name);
+                }
+            }
+
+            var workerText = workerNameList.length > 0
+                ? workerNameList.join(", ") + " (총 " + workerNameList.length + "명)"
+                : "없음 (총 0명)";
+            var extEqText = extEqList.length > 0
+                ? extEqList.join(", ") + " (총 " + extEqList.length + "대)"
+                : "없음 (총 0대)";
+            var expenseTotal = 0;
+
+            for(var k=0; k<expenses.length; k++) {
+                expenseTotal += Number(expenses[k].amt) || 0;
+            }
+
+            var summaryText = "📅 날짜: " + dt + "\n" +
+                              "📍 현장명: " + site + "\n" +
+                              "📊 진행율: " + progressText + "\n" +
+                              "👷 투입인원: " + workerText + "\n" +
+                              "🚚 외부장비: " + extEqText + "\n" +
+                              "💳 경비 합계: " + expenseTotal.toLocaleString() + "원\n" +
+                              note;
+
+            pendingKakaoSummary = summaryText;
+            document.getElementById('kakaoConfirmText').textContent = summaryText;
+            document.getElementById('kakaoConfirmOverlay').style.display = 'flex';
+        }
+
+        function cancelKakaoShare() {
+            document.getElementById('kakaoConfirmOverlay').style.display = 'none';
+            pendingKakaoSummary = "";
+        }
+
+        function confirmKakaoShare() {
+            var summaryText = pendingKakaoSummary;
+            document.getElementById('kakaoConfirmOverlay').style.display = 'none';
+            pendingKakaoSummary = "";
+            if(!summaryText) return;
+
+            if (navigator.share) {
+                navigator.share({
+                    text: summaryText
+                }).catch(function(err) {
+                    if(err && err.name === 'AbortError') return;
+                    copyToClipboardFallback(summaryText);
+                });
+            } else {
+                copyToClipboardFallback(summaryText);
+            }
+        }
+
+        function copyToClipboardFallback(text) {
+            if(navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert("✅ 작업 요약 내용이 클립보드에 복사되었습니다!\n\n카카오톡 채팅방에서 [붙여넣기] 하시면 바로 보낼 수 있습니다.");
+                }).catch(function() {
+                    copyWithTemporaryTextarea(text);
+                });
+                return;
+            }
+            copyWithTemporaryTextarea(text);
+        }
+
+        function copyWithTemporaryTextarea(text) {
+            var textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            try {
+                document.execCommand('copy');
+                alert("✅ 작업 요약 내용이 클립보드에 복사되었습니다!\n\n카카오톡 채팅방 창을 1초간 길게 눌러 [붙여넣기] 하시면 바로 보낼 수 있습니다.\n\n" + text);
+            } catch (err) {
+                alert("요약 내용:\n\n" + text);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function utf8Bytes(text) {
+            if(window.TextEncoder) return new TextEncoder().encode(text);
+            var encoded = unescape(encodeURIComponent(text));
+            var bytes = new Uint8Array(encoded.length);
+            for(var i=0; i<encoded.length; i++) bytes[i] = encoded.charCodeAt(i);
+            return bytes;
+        }
+
+        function dataUrlBytes(dataUrl) {
+            var comma = dataUrl.indexOf(',');
+            if(comma < 0) throw new Error('사진 데이터가 올바르지 않습니다.');
+            var binary = atob(dataUrl.slice(comma + 1));
+            var bytes = new Uint8Array(binary.length);
+            for(var i=0; i<binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return bytes;
+        }
+
+        function bytesToBase64(bytes) {
+            var binary = '';
+            var chunkSize = 0x8000;
+            for(var i=0; i<bytes.length; i += chunkSize) {
+                var chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+                binary += String.fromCharCode.apply(null, chunk);
+            }
+            return btoa(binary);
+        }
+
+        var crcTable = null;
+        function crc32(bytes) {
+            if(!crcTable) {
+                crcTable = [];
+                for(var n=0; n<256; n++) {
+                    var c = n;
+                    for(var k=0; k<8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                    crcTable[n] = c >>> 0;
+                }
+            }
+            var crc = 0xFFFFFFFF;
+            for(var i=0; i<bytes.length; i++) crc = crcTable[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+            return (crc ^ 0xFFFFFFFF) >>> 0;
+        }
+
+        function writeU16(bytes, offset, value) {
+            bytes[offset] = value & 0xFF;
+            bytes[offset + 1] = (value >>> 8) & 0xFF;
+        }
+
+        function writeU32(bytes, offset, value) {
+            bytes[offset] = value & 0xFF;
+            bytes[offset + 1] = (value >>> 8) & 0xFF;
+            bytes[offset + 2] = (value >>> 16) & 0xFF;
+            bytes[offset + 3] = (value >>> 24) & 0xFF;
+        }
+
+        function joinByteArrays(parts) {
+            var total = 0;
+            for(var i=0; i<parts.length; i++) total += parts[i].length;
+            var result = new Uint8Array(total), offset = 0;
+            for(var p=0; p<parts.length; p++) {
+                result.set(parts[p], offset);
+                offset += parts[p].length;
+            }
+            return result;
+        }
+
+        function makeZipBytes(entries) {
+            var now = new Date();
+            var dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+            var dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+            var localParts = [], centralParts = [], offset = 0, centralSize = 0;
+
+            for(var i=0; i<entries.length; i++) {
+                var nameBytes = utf8Bytes(entries[i].name);
+                var data = entries[i].bytes;
+                var checksum = crc32(data);
+                var local = new Uint8Array(30 + nameBytes.length);
+                writeU32(local, 0, 0x04034B50); writeU16(local, 4, 20); writeU16(local, 6, 0x0800); writeU16(local, 8, 0);
+                writeU16(local, 10, dosTime); writeU16(local, 12, dosDate); writeU32(local, 14, checksum);
+                writeU32(local, 18, data.length); writeU32(local, 22, data.length); writeU16(local, 26, nameBytes.length); writeU16(local, 28, 0);
+                local.set(nameBytes, 30);
+                localParts.push(local, data);
+
+                var central = new Uint8Array(46 + nameBytes.length);
+                writeU32(central, 0, 0x02014B50); writeU16(central, 4, 20); writeU16(central, 6, 20); writeU16(central, 8, 0x0800); writeU16(central, 10, 0);
+                writeU16(central, 12, dosTime); writeU16(central, 14, dosDate); writeU32(central, 16, checksum);
+                writeU32(central, 20, data.length); writeU32(central, 24, data.length); writeU16(central, 28, nameBytes.length);
+                writeU16(central, 30, 0); writeU16(central, 32, 0); writeU16(central, 34, 0); writeU16(central, 36, 0); writeU32(central, 38, 0); writeU32(central, 42, offset);
+                central.set(nameBytes, 46);
+                centralParts.push(central);
+                centralSize += central.length;
+                offset += local.length + data.length;
+            }
+
+            var end = new Uint8Array(22);
+            writeU32(end, 0, 0x06054B50); writeU16(end, 4, 0); writeU16(end, 6, 0);
+            writeU16(end, 8, entries.length); writeU16(end, 10, entries.length); writeU32(end, 12, centralSize); writeU32(end, 16, offset); writeU16(end, 20, 0);
+            return joinByteArrays(localParts.concat(centralParts).concat([end]));
+        }
+
+        function makeZipBlob(entries) {
+            return new Blob([makeZipBytes(entries)], {type:'application/zip'});
+        }
+
+        function downloadBlob(blob, fileName) {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = fileName; a.style.display = 'none';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+        }
+
+        function shareOrDownloadBundle(entries, fileName) {
+            var blob = makeZipBlob(entries);
+            var shareFiles = [];
+            try {
+                for(var i=0; i<entries.length; i++) {
+                    var mime = /\.xlsx$/i.test(entries[i].name) ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : (/\.csv$/i.test(entries[i].name) ? 'text/csv' : (/\.jpe?g$/i.test(entries[i].name) ? 'image/jpeg' : 'application/octet-stream'));
+                    shareFiles.push(new File([entries[i].bytes], entries[i].name, {type:mime}));
+                }
+            } catch(e) { shareFiles = []; }
+            var canShareFiles = false;
+            try { canShareFiles = !!(shareFiles.length && navigator.share && navigator.canShare && navigator.canShare({files:shareFiles})); } catch(e) {}
+
+            if(canShareFiles) {
+                return navigator.share({title:'진흥녹화센터 작업일지 파일', text:'파일에 저장하거나 원하는 앱으로 보내세요.', files:shareFiles}).then(function() {
+                    return 'shared';
+                }).catch(function(err) {
+                    if(err && err.name === 'AbortError') return 'cancelled';
+                    downloadBlob(blob, fileName);
+                    return 'downloaded';
+                });
+            }
+
+            var zipFile = null;
+            try { zipFile = new File([blob], fileName, {type:'application/zip'}); } catch(e) {}
+            var canShareZip = false;
+            try { canShareZip = !!(zipFile && navigator.share && navigator.canShare && navigator.canShare({files:[zipFile]})); } catch(e) {}
+            if(canShareZip) {
+                return navigator.share({title:'진흥녹화센터 작업일지 파일', text:'파일에 저장하거나 원하는 앱으로 보내세요.', files:[zipFile]}).then(function() {
+                    return 'shared';
+                }).catch(function(err) {
+                    if(err && err.name === 'AbortError') return 'cancelled';
+                    downloadBlob(blob, fileName);
+                    return 'downloaded';
+                });
+            }
+
+            downloadBlob(blob, fileName);
+            return Promise.resolve('downloaded');
+        }
+
+        function startGoogleUpload(payload, timeoutMs) {
+            var requestId = "req_" + new Date().getTime() + "_" + Math.floor(Math.random() * 1000000);
+            payload.requestId = requestId;
+            var iframeName = "hidden_iframe_" + requestId;
+            var iframe = document.createElement("iframe");
+            iframe.name = iframeName; iframe.style.display = "none";
+            iframe.title = "구글 드라이브 전송 결과";
+            document.body.appendChild(iframe);
+            var form = document.createElement("form");
+            form.method = "POST"; form.action = GOOGLE_SCRIPT_URL; form.target = iframeName; form.style.display = 'none';
+            var input = document.createElement("input");
+            input.type = "hidden"; input.name = "payload"; input.value = JSON.stringify(payload);
+            form.appendChild(input); document.body.appendChild(form);
+
+            var timerId = null;
+            var settled = false;
+            var handleMessage = null;
+            var promise = new Promise(function(resolve) {
+                function settle(result) {
+                    if(settled) return;
+                    settled = true;
+                    if(timerId) clearTimeout(timerId);
+                    window.removeEventListener('message', handleMessage);
+                    resolve(result);
+                }
+                handleMessage = function(event) {
+                    var allowedOrigin = /^https:\/\/(?:script\.google\.com|[a-z0-9.-]*script\.googleusercontent\.com)$/i.test(event.origin || '');
+                    var data = event.data;
+                    if(!allowedOrigin || !data || data.type !== 'jinheung-upload-result' || data.requestId !== requestId) return;
+                    settle(data);
+                };
+                window.addEventListener('message', handleMessage);
+                timerId = setTimeout(function() {
+                    settle({
+                        type: 'jinheung-upload-result', requestId: requestId, ok: false, timeout: true,
+                        message: '구글 드라이브 응답이 늦어 저장 상태를 다시 확인하고 있습니다.'
+                    });
+                }, timeoutMs || 90000);
+            });
+
+            form.submit();
+            return {
+                form: form, iframe: iframe, promise: promise,
+                cleanup: function() {
+                    if(timerId) clearTimeout(timerId);
+                    if(handleMessage) window.removeEventListener('message', handleMessage);
+                    try { if(form.parentNode) form.parentNode.removeChild(form); } catch(e) {}
+                    try { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); } catch(e) {}
+                }
+            };
+        }
+
+        function confirmTimedOutUpload(result) {
+            if(!result || !result.timeout || !result.requestId) return Promise.resolve(result);
+            var originalRequestId = result.requestId;
+            var statusTask = startGoogleUpload({action:'status', lookupRequestId:originalRequestId}, 30000);
+            return statusTask.promise.then(function(status) {
+                statusTask.cleanup();
+                if(status && (status.state === 'SOURCE_SAVED' || status.state === 'COMPLETE')) {
+                    status.ok = true;
+                    status.originalTimedOut = true;
+                    if(status.state === 'SOURCE_SAVED') {
+                        status.message = '입력 내용은 구글 드라이브 월별 누적 원본에 저장되었습니다. 월별 CSV와 Excel은 서버에서 계속 갱신 중입니다.';
+                    }
+                    return status;
+                }
+                return {
+                    type:'jinheung-upload-result', requestId:originalRequestId, ok:false,
+                    message:(status && status.message) || '구글 드라이브 저장 상태를 확인하지 못했습니다. 입력 내용은 휴대폰에 그대로 남아 있습니다.'
+                };
+            }).catch(function() {
+                statusTask.cleanup();
+                return result;
+            });
+        }
+
+        function finishProcessing(status, uploadTask, driveResult, sendContext) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            var line = document.getElementById('mobileSaveLine');
+            if(status === 'shared') line.textContent = '📲 파일 공유/저장 창 처리 완료';
+            else if(status === 'cancelled') line.textContent = 'ℹ️ 파일 저장 취소됨 (다시 처리 가능)';
+            else line.textContent = '📲 작업 파일 묶음 다운로드 시작';
+
+            var title = document.getElementById('resultTitle');
+            var icon = document.getElementById('resultIcon');
+            var cloudLine = document.getElementById('cloudSaveLine');
+            var summary = document.getElementById('resultSummary');
+            var note = document.getElementById('resultNote');
+            var closeButton = document.getElementById('resultCloseButton');
+            lastUploadOk = !!(driveResult && driveResult.ok);
+            if(lastUploadOk) {
+                if(sendContext && driveResult.journalNumber) {
+                    var assignedNumber = String(driveResult.journalNumber);
+                    sendContext.baseNum = String(driveResult.baseNumber || getBaseLogNumber(assignedNumber, sendContext.date));
+                    if(driveResult.revision !== undefined) sendContext.intendedRevision = parseInt(driveResult.revision, 10) || 0;
+                    sendContext.displayNumber = assignedNumber;
+                }
+                markLogSendSucceeded(sendContext);
+                icon.textContent = '🎉';
+                title.textContent = '일괄 처리 완료!';
+                title.style.color = '#15803d';
+                cloudLine.textContent = '☁️ ' + (driveResult.message || '구글 드라이브 월별 누적파일/영수증 저장 완료');
+                summary.style.background = '#f0fdf4'; summary.style.borderColor = '#bbf7d0';
+                note.innerHTML = '아래 버튼을 누르시면 내일 일지 작성을 위해<br>화면이 깨끗하게 초기화됩니다.';
+                closeButton.textContent = '확인 (화면 초기화)';
+                closeButton.style.background = '#166534';
+            } else {
+                markLogSendFailed(sendContext);
+                var reason = driveResult && driveResult.message ? String(driveResult.message) : '구글 드라이브의 저장 결과를 확인하지 못했습니다.';
+                if(reason.length > 140) reason = reason.substring(0, 140) + '…';
+                icon.textContent = '⚠️';
+                title.textContent = '구글 드라이브 저장 확인 필요';
+                title.style.color = '#b45309';
+                cloudLine.textContent = '☁️ 저장 미확인: ' + reason;
+                summary.style.background = '#fffbeb'; summary.style.borderColor = '#fde68a';
+                note.innerHTML = '입력 내용은 그대로 유지됩니다.<br>Apps Script 배포 상태를 확인한 뒤 다시 전송해주세요.';
+                closeButton.textContent = '닫기 (작성 내용 유지)';
+                closeButton.style.background = '#b45309';
+            }
+            document.getElementById('successOverlay').style.display = 'flex';
+            isProcessing = false;
+            document.getElementById('sendAllButton').disabled = false;
+            if(driveResult && driveResult.originalTimedOut) {
+                setTimeout(function(){ uploadTask.cleanup(); }, 300000);
+            } else uploadTask.cleanup();
+        }
+
+        function saveAndSendAll() {
+            if(isProcessing) return;
+            if(GOOGLE_SCRIPT_URL.indexOf("script.google.com") === -1) return alert("코드에 구글 웹앱 주소를 꼭 넣어주세요!");
+
+            var sendContext = null;
+            try {
+                var logs = getSafeLogs();
+                var isNew = !currentLogId;
+                var previousLog = isNew ? null : findLogById(logs, currentLogId);
+                var revisionState = getNextSendRevision(previousLog, document.getElementById('i_count').value);
+                var obj = {
+                    id: currentLogId || new Date().getTime().toString(),
+                    updatedAt: new Date().getTime(),
+                    w: document.getElementById('i_writer').value,
+                    num: revisionState.previousDisplay,
+                    baseNum: revisionState.baseNum, rev: revisionState.previousRevision, sent: revisionState.previouslySent,
+                    date: document.getElementById('i_date').value, wea: document.getElementById('i_weather').value,
+                    site: document.getElementById('i_site').value, days: document.getElementById('i_days').value,
+                    prog: document.getElementById('i_prog').value, note: document.getElementById('i_note').value,
+                    workers: JSON.parse(JSON.stringify(workers)), equips: JSON.parse(JSON.stringify(equips)), expenses: JSON.parse(JSON.stringify(expenses))
+                };
+                if(isNew) logs.push(obj);
+                else {
+                    var updated = false;
+                    for(var i=0; i<logs.length; i++) {
+                        if(logs[i].id === currentLogId) { logs[i] = obj; updated = true; break; }
+                    }
+                    if(!updated) logs.push(obj);
+                }
+                if(!saveLogs(logs, obj.id)) return;
+                rememberCurrentWriter();
+                if(isNew) { currentLogId = obj.id; advanceStoredCount(obj.baseNum); }
+
+                sendContext = {
+                    id: obj.id, baseNum: revisionState.baseNum,
+                    date: obj.date,
+                    previousRevision: revisionState.previousRevision,
+                    previouslySent: revisionState.previouslySent,
+                    intendedRevision: revisionState.intendedRevision,
+                    previousDisplay: revisionState.previousDisplay,
+                    displayNumber: revisionState.displayNumber
+                };
+                var sendObj = JSON.parse(JSON.stringify(obj));
+                sendObj.num = revisionState.displayNumber;
+                sendObj.rev = revisionState.intendedRevision;
+                sendObj.sent = true;
+                document.getElementById('i_count').value = revisionState.displayNumber;
+
+                var wr = document.getElementById('i_writer').value || '작성자미정';
+                sendContext.writer = wr;
+                var appendCsvStr = generateCSVString([sendObj]);
+                if(!appendCsvStr) return alert("전송할 내용이 없습니다.");
+                var dt = document.getElementById('i_date').value || '날짜미정';
+                var photoArr = [];
+                var cnt = 0;
+                for(var p=0; p<expenses.length; p++) {
+                    if(expenses[p].photo) {
+                        cnt++;
+                        var pName = dt + "_" + wr + "_일지" + revisionState.displayNumber + "_" + expenses[p].cat + "_영수증" + cnt + ".jpg";
+                        photoArr.push({name:pName, data:expenses[p].photo});
+                    }
+                }
+
+                isProcessing = true;
+                document.getElementById('sendAllButton').disabled = true;
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                var payload = {
+                    writer: wr,
+                    logId: obj.id,
+                    journalNumber: revisionState.displayNumber,
+                    revision: revisionState.intendedRevision,
+                    appendCsvContent: "\uFEFF" + appendCsvStr,
+                    photos: photoArr
+                };
+                var uploadTask = startGoogleUpload(payload);
+                var receivedDriveResult = null;
+                uploadTask.promise.then(confirmTimedOutUpload).then(function(driveResult) {
+                    receivedDriveResult = driveResult;
+                    var finalNumber = driveResult && driveResult.ok && driveResult.journalNumber ? String(driveResult.journalNumber) : revisionState.displayNumber;
+                    var finalSendObj = JSON.parse(JSON.stringify(sendObj));
+                    finalSendObj.num = finalNumber;
+                    finalSendObj.baseNum = driveResult && driveResult.ok && driveResult.baseNumber ? String(driveResult.baseNumber) : revisionState.baseNum;
+                    finalSendObj.rev = driveResult && driveResult.ok && driveResult.revision !== undefined ? (parseInt(driveResult.revision, 10) || 0) : revisionState.intendedRevision;
+
+                    var finalWriterLogs = [];
+                    var finalPeriod = getWorkYearMonth(finalSendObj.date);
+                    for(var fl=0; fl<logs.length; fl++) {
+                        var logPeriod = getWorkYearMonth(logs[fl].date);
+                        if(logs[fl].w === wr && finalPeriod && logPeriod && logPeriod.key === finalPeriod.key) {
+                            finalWriterLogs.push(logs[fl].id === obj.id ? finalSendObj : logs[fl]);
+                        }
+                    }
+                    var finalCsvStr = generateCSVString(finalWriterLogs);
+                    var monthlyLabel = getMonthlyFileLabel(finalSendObj.date);
+                    var entries = [{name:monthlyLabel + "_" + wr + "_일지" + finalNumber + "_작업일지.xlsx", bytes:makeXlsxBytes(finalCsvStr)}];
+                    var localPhotoCount = 0;
+                    for(var lp=0; lp<expenses.length; lp++) {
+                        if(expenses[lp].photo) {
+                            localPhotoCount++;
+                            var localPhotoName = dt + "_" + wr + "_일지" + finalNumber + "_" + expenses[lp].cat + "_영수증" + localPhotoCount + ".jpg";
+                            entries.push({name:localPhotoName, bytes:dataUrlBytes(expenses[lp].photo)});
+                        }
+                    }
+                    var bundleName = monthlyLabel + "_" + wr + "_일지" + finalNumber + "_파일묶음.zip";
+                    return shareOrDownloadBundle(entries, bundleName).then(function(status) {
+                        finishProcessing(status, uploadTask, driveResult, sendContext);
+                    });
+                }).catch(function(err) {
+                    if(receivedDriveResult) {
+                        finishProcessing('cancelled', uploadTask, receivedDriveResult, sendContext);
+                        return;
+                    }
+                    uploadTask.cleanup();
+                    markLogSendFailed(sendContext);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    isProcessing = false;
+                    document.getElementById('sendAllButton').disabled = false;
+                    alert("파일 저장 중 오류가 발생했습니다: " + (err.message || err));
+                });
+            } catch(e) {
+                markLogSendFailed(sendContext);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                isProcessing = false;
+                document.getElementById('sendAllButton').disabled = false;
+                alert("일괄 처리 중 오류가 발생했습니다: " + (e.message || e));
+            }
+        }
+
+        function closeSuccessAndReset() {
+            clearFormForNewLog();
+        }
+
+        function closeResultOverlay() {
+            if(lastUploadOk) closeSuccessAndReset();
+            else {
+                document.getElementById('successOverlay').style.display = 'none';
+                switchTab(0);
+            }
+        }
+    </script>
+</body>
+</html>
